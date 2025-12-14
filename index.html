@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>あなたの前世メーカー</title>
+  <style>
+    :root{
+      --bg1:#070a18;
+      --bg2:#1a0f2e;
+      --card:#0f1733cc;
+      --stroke:#ffffff22;
+      --text:#f6f7ff;
+      --muted:#cfd3ffcc;
+      --accent:#9b8cff;
+      --accent2:#ff7bd1;
+      --ok:#36ffd7;
+      --danger:#ff5b7a;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #2a2fff33, transparent 60%),
+        radial-gradient(1000px 700px at 80% 30%, #ff4fd833, transparent 55%),
+        radial-gradient(900px 700px at 40% 90%, #36ffd733, transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    .wrap{ width:min(980px, 92vw); padding:28px 0; }
+    .hero{ text-align:center; margin-bottom:18px; }
+    .badge{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 14px; border:1px solid var(--stroke);
+      border-radius:999px;
+      background:linear-gradient(180deg, #ffffff10, #ffffff06);
+      box-shadow: 0 10px 40px #00000044;
+      color:var(--muted);
+      font-size:13px; letter-spacing:.04em;
+      backdrop-filter: blur(10px);
+    }
+    .title{
+      margin:14px 0 8px;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height:1.1;
+      letter-spacing:.02em;
+      text-shadow: 0 0 30px #ffffff22;
+    }
+    .subtitle{
+      margin:0 auto;
+      max-width:64ch;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    .card{
+      margin:22px auto 0;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, #ffffff10, #ffffff06), var(--card);
+      border-radius:22px;
+      box-shadow: 0 24px 90px #00000066;
+      backdrop-filter: blur(14px);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(620px 240px at 50% 0%, #9b8cff55, transparent 62%),
+        radial-gradient(520px 240px at 20% 100%, #ff7bd155, transparent 62%),
+        radial-gradient(520px 280px at 80% 120%, #36ffd733, transparent 62%);
+      pointer-events:none;
+      opacity:.9;
+      filter: blur(12px);
+    }
+    .cardInner{ position:relative; padding:22px; }
+
+    .grid{
+      display:grid; gap:14px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 780px){
+      .grid{ grid-template-columns: 1.08fr .92fr; align-items:stretch; }
+    }
+
+    .panel{
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      padding:16px;
+      background: #0c1330aa;
+    }
+    .panel h2{
+      margin:0 0 10px;
+      font-size:16px;
+      color:#ffffffdd;
+      letter-spacing:.02em;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .smallToggle{
+      display:inline-flex; align-items:center; gap:8px;
+      color:var(--muted); font-size:12px;
+      user-select:none;
+    }
+    .smallToggle input{ width:18px; height:18px; accent-color: var(--accent); }
+
+    .row{ display:grid; gap:10px; margin-top:10px; }
+    .row2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid #ffffff22;
+      background:#070b1e;
+      color:var(--text);
+      font-size:16px;
+      outline:none;
+      transition:.2s ease;
+    }
+    input:focus{ border-color:#ffffff55; box-shadow:0 0 0 4px #9b8cff22; }
+
+    .actions{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+    button{
+      cursor:pointer;
+      border:none;
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:800;
+      letter-spacing:.02em;
+      font-size:14px;
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    button:active{ transform: translateY(1px) scale(0.99); }
+
+    .btnMain{
+      flex: 1 1 180px;
+      color:#0b0f1e;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 14px 40px #9b8cff44;
+    }
+    .btnSub{
+      flex: 1 1 140px;
+      color:var(--text);
+      background: #0a1030;
+      border:1px solid #ffffff22;
+    }
+    .btnGhost{
+      flex: 1 1 140px;
+      color:#0b0f1e;
+      background: linear-gradient(135deg, #36ffd7, #9b8cff);
+    }
+
+    .resultBox{ display:grid; gap:10px; min-height: 220px; align-content:start; }
+    .result{
+      padding:16px;
+      border-radius:18px;
+      border:1px solid #ffffff22;
+      background: linear-gradient(180deg, #ffffff10, #ffffff06);
+      position:relative;
+      overflow:hidden;
+    }
+    .result::after{
+      content:"";
+      position:absolute; inset:-70px;
+      background: conic-gradient(from 180deg, #9b8cff00, #9b8cff66, #ff7bd166, #36ffd744, #9b8cff00);
+      opacity:.35;
+      filter: blur(18px);
+      animation: spin 7s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes spin{ from{ transform: rotate(0deg);} to{ transform: rotate(360deg);} }
+
+    /* バズ演出：判定時にキラッ */
+    .sparkle{
+      position:absolute;
+      inset:-40px;
+      background: radial-gradient(300px 140px at var(--x, 20%) var(--y, 20%), #ffffffaa, transparent 60%);
+      mix-blend-mode: overlay;
+      opacity:0;
+      pointer-events:none;
+      transform: rotate(8deg);
+      filter: blur(2px);
+    }
+    .result.pop .sparkle{
+      animation: sparkle 700ms ease-out 1;
+    }
+    @keyframes sparkle{
+      0%{ opacity:0; transform: scale(0.98) rotate(8deg); }
+      15%{ opacity:.75; }
+      70%{ opacity:.25; }
+      100%{ opacity:0; transform: scale(1.03) rotate(8deg); }
+    }
+
+    .resultText{
+      position:relative;
+      z-index:1;
+      font-size: clamp(18px, 2.6vw, 24px);
+      line-height:1.55;
+      font-weight:900;
+      text-shadow: 0 0 24px #00000066;
+      word-break: keep-all;
+      min-height: 3.2em;
+    }
+    .meta{
+      position:relative; z-index:1;
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+    }
+    .chip{
+      border:1px solid #ffffff22;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#00000022;
+    }
+
+    .shareBox{
+      position:relative; z-index:1;
+      display:grid; gap:10px;
+      margin-top:12px;
+    }
+    textarea{
+      width:100%;
+      min-height:84px;
+      resize:vertical;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid #ffffff22;
+      background:#070b1e;
+      color:var(--text);
+      font-size:13px;
+      line-height:1.6;
+      outline:none;
+    }
+    textarea:focus{ border-color:#ffffff55; box-shadow:0 0 0 4px #9b8cff22; }
+
+    .miniActions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .miniBtn{
+      flex: 1 1 140px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid #ffffff22;
+      background:#0a1030;
+      color:var(--text);
+      font-weight:800;
+      cursor:pointer;
+    }
+    .toast{
+      margin-top:8px;
+      font-size:12px;
+      color:#dffef8;
+      background:#36ffd722;
+      border:1px solid #36ffd755;
+      padding:8px 10px;
+      border-radius:12px;
+      display:none;
+    }
+    .toast.show{ display:inline-block; }
+
+    .error{
+      color:#ffe5ea;
+      background:#ff5b7a22;
+      border:1px solid #ff5b7a55;
+      padding:10px 12px;
+      border-radius:14px;
+      font-weight:800;
+    }
+
+    .history{
+      margin-top:12px;
+      border-top:1px dashed #ffffff22;
+      padding-top:12px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.7;
+    }
+    .history ul{ margin:8px 0 0; padding-left:18px; }
+    .footerNote{
+      margin:12px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="badge">🌀 あなたの前世｜スクショ映えモード</div>
+      <h1 class="title">あなたの前世メーカー</h1>
+      <p class="subtitle">誕生日の<strong>月</strong>と<strong>日</strong>を入れて判定。結果は<strong>コピー</strong>や<strong>シェア</strong>でそのまま投稿できます。</p>
+    </div>
+
+    <div class="card">
+      <div class="cardInner">
+        <div class="grid">
+          <div class="panel">
+            <h2>
+              入力
+              <label class="smallToggle" title="効果音ON/OFF">
+                <input id="soundToggle" type="checkbox" checked />
+                効果音
+              </label>
+            </h2>
+
+            <div class="row">
+              <div class="row2">
+                <div>
+                  <label for="month">誕生日（月）</label>
+                  <input id="month" type="number" inputmode="numeric" placeholder="例：7" min="1" max="12" />
+                </div>
+                <div>
+                  <label for="day">誕生日（日）</label>
+                  <input id="day" type="number" inputmode="numeric" placeholder="例：27" min="1" max="31" />
+                </div>
+              </div>
+
+              <div class="actions">
+                <button class="btnMain" id="btnCheck">前世をみる</button>
+                <button class="btnGhost" id="btnCopyResult">結果だけコピー</button>
+                <button class="btnSub" id="btnRandom">ランダム</button>
+                <button class="btnSub" id="btnReset">リセット</button>
+              </div>
+
+              <div id="errorBox" style="display:none;" class="error"></div>
+
+              <div class="history">
+                <strong>直近の結果（5件）</strong>
+                <ul id="historyList"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel resultBox">
+            <h2>結果</h2>
+
+            <div class="result" id="resultCard" aria-live="polite">
+              <div class="sparkle"></div>
+              <div id="resultText" class="resultText">ここに結果が出ます。</div>
+              <div class="meta" id="metaChips" style="display:none;"></div>
+
+              <div class="shareBox" id="shareBox" style="display:none;">
+                <label for="shareText" style="margin:6px 0 0;">投稿用テキスト（そのまま貼れる）</label>
+                <textarea id="shareText" readonly></textarea>
+
+                <div class="miniActions">
+                  <button class="miniBtn" id="btnCopyShare">投稿文コピー</button>
+                  <button class="miniBtn" id="btnShare">共有（対応端末）</button>
+                </div>
+                <div class="toast" id="toast">コピーしました！</div>
+              </div>
+            </div>
+
+            <p class="footerNote">バズり用Tips：結果カードをスクショ→「友達の前世もやってみて」って一言添えると強い。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 月のフレーズ
+    const monthMap = {
+      1: "見た目は完璧な",
+      2: "掴みどころのない",
+      3: "知性あふれる",
+      4: "世界にバレた",
+      5: "あざと可愛い",
+      6: "心がポカポカな",
+      7: "静かに沸騰する",
+      8: "太陽より目立つ",
+      9: "吸い込まれるような",
+      10:"守りたくなる",
+      11:"分析型の",
+      12:"クセ強めな"
+    };
+
+    // 日の肩書（★27日追加）
+    const dayMap = {
+      1: "アイドル",
+      2: "陽キャ",
+      3: "ねこ",
+      4: "ナルシスト",
+      5: "パリピ",
+      6: "ジョージ",
+      7: "大谷翔平",
+      8: "パンダ",
+      9: "社長令嬢",
+      10:"霊",
+      11:"リーダー",
+      12:"歌手",
+      13:"神",
+      14:"美少女",
+      15:"海賊",
+      16:"優等生",
+      17:"トトロ",
+      18:"一軍",
+      19:"先生",
+      20:"将軍",
+      21:"橋本環奈",
+      22:"天使",
+      23:"イケメン",
+      24:"チビ",
+      25:"ストーカー",
+      26:"魔法使い",
+      27:"ラスボス",   // ←追加（バズり枠）
+      28:"野球英孝",
+      29:"ニート",
+      30:"王様",
+      31:"勇者"
+    };
+
+    const elMonth = document.getElementById("month");
+    const elDay = document.getElementById("day");
+    const elResult = document.getElementById("resultText");
+    const elError = document.getElementById("errorBox");
+    const elSound = document.getElementById("soundToggle");
+
+    const elResultCard = document.getElementById("resultCard");
+    const elMeta = document.getElementById("metaChips");
+    const elShareBox = document.getElementById("shareBox");
+    const elShareText = document.getElementById("shareText");
+    const elToast = document.getElementById("toast");
+    const elHistoryList = document.getElementById("historyList");
+
+    let lastResultText = "";
+
+    // --- 効果音（WebAudio：外部ファイル不要） ---
+    let audioCtx = null;
+    function beep({type="sine", freq=880, duration=0.08, gain=0.08} = {}){
+      if (!elSound.checked) return;
+      try{
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.value = gain;
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start();
+        o.stop(audioCtx.currentTime + duration);
+      }catch(e){ /* noop */ }
+    }
+    function successSound(){
+      beep({type:"triangle", freq:740, duration:0.07, gain:0.07});
+      setTimeout(()=>beep({type:"triangle", freq:990, duration:0.09, gain:0.06}), 80);
+      setTimeout(()=>beep({type:"sine", freq:1320, duration:0.10, gain:0.05}), 170);
+    }
+    function errorSound(){
+      beep({type:"square", freq:220, duration:0.12, gain:0.05});
+      setTimeout(()=>beep({type:"square", freq:180, duration:0.14, gain:0.05}), 120);
+    }
+
+    function showError(msg){
+      elError.style.display = "block";
+      elError.textContent = msg;
+      errorSound();
+    }
+    function clearError(){
+      elError.style.display = "none";
+      elError.textContent = "";
+    }
+
+    // --- バズ演出：タイプライター + キラッ ---
+    function popSparkle(){
+      // ランダム位置で光らせる
+      const x = Math.floor(Math.random()*70) + 15; // 15%〜85%
+      const y = Math.floor(Math.random()*50) + 10; // 10%〜60%
+      elResultCard.style.setProperty("--x", x + "%");
+      elResultCard.style.setProperty("--y", y + "%");
+
+      elResultCard.classList.remove("pop");
+      void elResultCard.offsetWidth; // reflow
+      elResultCard.classList.add("pop");
+    }
+
+    async function typeText(text, speed=18){
+      elResult.textContent = "";
+      for (let i=0; i<text.length; i++){
+        elResult.textContent += text[i];
+        if (i % 6 === 0) beep({type:"sine", freq: 760 + (i%10)*20, duration:0.02, gain:0.02});
+        await new Promise(r => setTimeout(r, speed));
+      }
+    }
+
+    // --- 履歴（localStorage：直近5件） ---
+    const HISTORY_KEY = "zense_history_v1";
+    function loadHistory(){
+      try{
+        const raw = localStorage.getItem(HISTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+      }catch{ return []; }
+    }
+    function saveHistory(list){
+      try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0,5))); }catch{}
+    }
+    function renderHistory(){
+      const list = loadHistory();
+      elHistoryList.innerHTML = "";
+      if (!list.length){
+        elHistoryList.innerHTML = "<li>まだありません</li>";
+        return;
+      }
+      list.forEach(item=>{
+        const li = document.createElement("li");
+        li.textContent = item;
+        elHistoryList.appendChild(li);
+      });
+    }
+    function pushHistory(text){
+      const list = loadHistory();
+      const next = [text, ...list.filter(x=>x!==text)];
+      saveHistory(next);
+      renderHistory();
+    }
+
+    function buildShareText(resultText, m, d){
+      const hashtag = "#あなたの前世 #前世診断 #誕生日 #占い #診断メーカー";
+      // 投稿しやすい「誘い文句」を添える（バズ狙い）
+      return [
+        `【あなたの前世診断】`,
+        `誕生日：${m}月${d}日`,
+        `${resultText}`,
+        ``,
+        `友達のもやってみて→ このページで月日入力するだけ`,
+        hashtag
+      ].join("\n");
+    }
+
+    function showToast(msg="コピーしました！"){
+      elToast.textContent = msg;
+      elToast.classList.add("show");
+      setTimeout(()=>elToast.classList.remove("show"), 1400);
+    }
+
+    async function copyToClipboard(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        showToast("コピーしました！");
+        successSound();
+      }catch{
+        // フォールバック
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        showToast("コピーしました！");
+        successSound();
+      }
+    }
+
+    function validate(m, d){
+      if (!m || !d) return "月と日を入力してください（例：7 / 21）";
+      if (m < 1 || m > 12) return "月は1〜12で入力してください。";
+      if (d < 1 || d > 31) return "日は1〜31で入力してください。";
+      if (!dayMap[d]) return "その日はリストにありません。";
+      return "";
+    }
+
+    async function judge(){
+      clearError();
+
+      const m = Number(elMonth.value);
+      const d = Number(elDay.value);
+
+      const err = validate(m, d);
+      if (err){
+        elMeta.style.display = "none";
+        elShareBox.style.display = "none";
+        lastResultText = "";
+        elResult.textContent = "ここに結果が出ます。";
+        showError(err);
+        return;
+      }
+
+      const monthWord = monthMap[m];
+      const dayWord = dayMap[d];
+
+      const resultText = `あなたの前世は、、${monthWord} ${dayWord}です！`;
+      lastResultText = resultText;
+
+      // 演出
+      popSparkle();
+      successSound();
+      await typeText(resultText, 16);
+
+      // メタ情報（スクショ映え）
+      elMeta.innerHTML = `
+        <span class="chip">📅 ${m}月${d}日</span>
+        <span class="chip">✨ ${monthWord}</span>
+        <span class="chip">🧩 ${dayWord}</span>
+      `;
+      elMeta.style.display = "flex";
+
+      // 投稿用テキスト
+      elShareText.value = buildShareText(resultText, m, d);
+      elShareBox.style.display = "grid";
+
+      pushHistory(resultText);
+    }
+
+    function randomPick(){
+      clearError();
+      const m = Math.floor(Math.random()*12) + 1;
+      const days = Object.keys(dayMap).map(Number);
+      const d = days[Math.floor(Math.random()*days.length)];
+      elMonth.value = m;
+      elDay.value = d;
+      judge();
+    }
+
+    function resetAll(){
+      clearError();
+      elMonth.value = "";
+      elDay.value = "";
+      lastResultText = "";
+      elResult.textContent = "ここに結果が出ます。";
+      elMeta.style.display = "none";
+      elShareBox.style.display = "none";
+      elMonth.focus();
+      beep({type:"sine", freq:520, duration:0.05, gain:0.04});
+    }
+
+    // --- ボタン ---
+    document.getElementById("btnCheck").addEventListener("click", judge);
+    document.getElementById("btnRandom").addEventListener("click", randomPick);
+    document.getElementById("btnReset").addEventListener("click", resetAll);
+
+    // 結果だけコピー
+    document.getElementById("btnCopyResult").addEventListener("click", () => {
+      if (!lastResultText){
+        showToast("先に診断してね！");
+        errorSound();
+        return;
+      }
+      copyToClipboard(lastResultText);
+    });
+
+    // 投稿文コピー
+    document.getElementById("btnCopyShare").addEventListener("click", () => {
+      if (!elShareText.value){
+        showToast("先に診断してね！");
+        errorSound();
+        return;
+      }
+      copyToClipboard(elShareText.value);
+    });
+
+    // 共有（対応ブラウザのみ）
+    document.getElementById("btnShare").addEventListener("click", async () => {
+      if (!elShareText.value){
+        showToast("先に診断してね！");
+        errorSound();
+        return;
+      }
+      if (navigator.share){
+        try{
+          await navigator.share({
+            title: "あなたの前世メーカー",
+            text: elShareText.value
+          });
+          successSound();
+        }catch(e){
+          // ユーザーキャンセルなど
+        }
+      }else{
+        showToast("この端末は共有に未対応。投稿文コピーを使ってね！");
+        beep({type:"square", freq:300, duration:0.06, gain:0.03});
+      }
+    });
+
+    // Enterキーでも判定
+    [elMonth, elDay].forEach(el => {
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") judge();
+      });
+    });
+
+    renderHistory();
+  </script>
+</body>
+</html>
